@@ -6,7 +6,7 @@ LIBDIR ?= $(PREFIX)/lib
 CNFDIR ?= /etc
 ARCHBUILDER_LIB_DIR ?= $(LIBDIR)/$(PROGNM)
 ARCHBUILDER_CONF_DIR ?= $(CNFDIR)/$(PROGNM)
-ARCHBUILDER_VERSION ?= 0.9.1
+ARCHBUILDER_VERSION ?= 0.9.2
 
 .PHONY: install build archbuilder
 
@@ -19,6 +19,7 @@ archbuilder: archbuilder.in
 
 install-archbuilder: archbuilder
 	@install -Dm755 archbuilder -t '$(DESTDIR)$(BINDIR)'
+	@install -Dm755 archbuilderwrap -t '$(DESTDIR)$(BINDIR)'
 
 install: install-archbuilder
 	@install -Dm644 lib/archbuilder.inc.sh -t '$(DESTDIR)$(LIBDIR)/$(PROGNM)'

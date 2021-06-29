@@ -12,6 +12,8 @@ readonly conf_dir='ARCHBUILDER_CONF_DIR'
 . "${lib_dir}/archbuilder.inc.sh"
 . "${lib_dir}/buildah.inc.sh"
 
+test_file "${HOME}/.archbuilder/archbuilder.env" \
+    && . "${HOME}/.archbuilder/archbuilder.env"
 
 # internal params
 unset _FLAG_KEEP
