@@ -1,0 +1,145 @@
+#!/bin/bash
+
+readonly archbuilder_version='ARCHBUILDER_VERSION'
+readonly lib_dir='ARCHBUILDER_LIB_DIR'
+readonly conf_dir='ARCHBUILDER_CONF_DIR'
+
+. "${lib_dir}/ext/slog.sh"
+. "${lib_dir}/ext/bash_log_internals.inc.sh"
+
+. "${conf_dir}/archbuilder.env"
+
+. "${lib_dir}/archbuilder.inc.sh"
+. "${lib_dir}/buildah.inc.sh"
+
+
+# internal params
+unset _FLAG_KEEP
+unset _FLAG_SILENT
+
+_OPT_MODE="build"
+_OPT_DEPS=()
+_OPT_KEYS=()
+
+_OPT_CON_BUILD_USER="archbuilder"
+_OPT_CON_COPTIONS=""
+
+# actions to initialize runtime
+unset _ACT_CREATE_IMAGE
+unset _ACT_CREATE_BASE_DIR
+unset _ACT_CREATE_CACHE_REPO_PATH
+unset _ACT_CREATE_LOG_PATH
+
+function usage() {
+    echo "archbuilder is a makepkg wrapper that uses buildah for the build process."
+    echo "That will lead to a very clean build, where the PKGBUILD and the dependencies,"
+    echo "have to be 100% correct and nothing will pollute the host system."
+    echo
+    echo "Usage:"
+    echo "  archbuilder [options] -- <coptions>"
+    echo
+    echo "Options:"
+    echo -e "  -h, --help\t\t\t\t\tPrint this help"
+    echo -e "  -k, --keep\t\t\t\t\tKeep the working container that is used for the build"
+    echo -e "  -n, --name <string>\t\t\t\tImage name that is used to spin up the container (default: ${INAME})"
+    echo -e "  -m, --mode <create | update | build>\t\tRun mode: (default: ${MODE})"
+    echo -e "                                      \t\tcreate will setup the base image"
+    echo -e "                                      \t\tupdate will update the base image"
+    echo -e "                                      \t\tbuild will build the PKGBUILD"
+    echo -e "  -d, --dep <string>\t\t\t\tPath to pacman package file that is needed as dependency for the build. (Can be added multiple times)"
+    echo -e "  -e, --key <string>\t\t\t\tPublic signing keys that should be trusted by for the build. (Can be added multiple times)"
+    echo -e "  -r, --repo <string>\t\t\t\tHost path to use as repository inside the container. This can be used to avoid"
+    echo -e "                     \t\t\t\thanding over dependencies via command line arguments as they will be added to this repo"
+    echo -e "  -s, --silent <string>\t\t\t\tMake container silent: No output from container commands will be send to shell."
+    echo -e "  --version <string>\t\t\t\tPrint version information."
+    echo
+    echo "coptions:"
+    echo -e "  These options will be handed over directly to makepkg inside the buildah container to build the package."
+    echo -e "  coptions has to be added ater the double dash -- to work."
+}
+
+options=$(getopt \
+    -o hkn:m:p:d:r:e:s \
+    -l "help" \
+    -l keep \
+    -l name: \
+    -l mode: \
+    -l dep: \
+    -l repo: \
+    -l silent: \
+    -l version \
+    -l key: -- "$@" 2>/dev/null)
+
+eval set -- "${options}"
+while true; do
+    case "${1}" in
+        -k|--keep)
+            _FLAG_KEEP=1
+            ;;
+        -n|--name)
+            shift
+            ARCHBUILDER_IMAGE_NAME=${1}
+            ;;
+        -m|--mode)
+            shift
+            _OPT_MODE="${1}"
+            ;;
+        -d|--dep)
+            shift
+            _OPT_DEPS[${#_OPT_DEPS[*]}]="${1}"
+            ;;
+        -e|--key)
+            shift
+            _OPT_KEYS[${#_OPT_KEYS[*]}]="${1}"
+            ;;
+        -r|--repo)
+            shift
+            ARCHBUILDER_CACHE_REPO="${1}"
+            ;;
+        -s|--silent)
+            _FLAG_SILENT=1
+            ;;
+        --version)
+            echo -e "archbuilder v${archbuilder_version}"
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -h|--help|*)
+            usage
+            exit 0
+            ;;
+    esac
+    shift
+done
+
+_OPT_CON_COPTIONS=$@
+
+set_env
+init_env
+
+buildah_prepare_params
+
+
+function exit_trap() {
+    buildah_exit
+}
+trap exit_trap EXIT
+
+buildah_create
+
+case "${_OPT_MODE}" in
+    "create")
+        buildah_create
+        ;;
+    "update")
+        buildah_update
+        ;;
+    "build")
+        buildah_build
+        ;;
+esac
+
+exit 0
