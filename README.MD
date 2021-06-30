@@ -54,7 +54,7 @@ For a list of possible arguments just use the help flag:
     
 ## SETUP WITH AURUTILS
 
-Create a user or grant your user the permissions to run buildah via subuid and subgid for a more detailed documentation check the [wiki] (https://wiki.archlinux.org/title/Buildah):
+Create a user or grant your user the permissions to run buildah via subuid and subgid for a more detailed documentation check the [wiki](https://wiki.archlinux.org/title/Buildah):
 
     /etc/subuid
     youruser:100000:65536
