@@ -1,11 +1,11 @@
 ## SYNOPSIS
   
-__archbuilder__ is a wrapper for makepkg which uses [buildah] (https://buildah.io/) containers
+__archbuilder__ is a wrapper for makepkg which uses [buildah](https://buildah.io/) containers
 to run the working makepkg.
 This will lead to a clean host system and reproduceble builds for the packages.
 
-__archbuilder__ works great together with [aurutils] (https://github.com/AladW/aurutils) to have 
-a great [Arch User Repository] (https://wiki.archlinux.org/index.php/Arch_User_Repository) toolset.
+__archbuilder__ works great together with [aurutils](https://github.com/AladW/aurutils) to have 
+a great [Arch User Repository](https://wiki.archlinux.org/index.php/Arch_User_Repository) toolset.
   
 ## INSTALLATION
 
@@ -62,7 +62,7 @@ Create a user or grant your user the permissions to run buildah via subuid and s
     /etc/subgid
     youruser:100000:65536
     
-Create a repository, that is owned by this user for using [aurutils] (https://github.com/AladW/aurutils):
+Create a repository, that is owned by this user for using [aurutils](https://github.com/AladW/aurutils):
 
     mkdir /var/cache/pacman/myrepo
     chown -R youruser: /var/cache/pacman/myrepo
