@@ -44,7 +44,7 @@ It will replace makepkg for the build process by using buildah.
 
     archbuilder
     
-If you want to pass flags of makepkg to archbuilder just hand them over after two dashes:
+If you want to pass flags to makepkg from archbuilder just hand them over after two dashes:
 
     archbuilder -- --syncdeps
 
