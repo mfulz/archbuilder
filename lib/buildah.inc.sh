@@ -164,15 +164,18 @@ function buildah_build() {
     arrExt=(${arrExt//=/ })
     ext=$(echo "${arrExt[1]}" | cut -d "'" -f 2)
 
+    log_debug "Running makepkg"
     exec_cmd buildah run --user "${_OPT_CON_BUILD_USER}" ${_BUILDAH_PARAMS} "${_BUILDAH_CONT}" \
         bash -c "cd ${_BUILDAH_MKPKG_PATH} && ${_BUILDAH_MAKEPKG_ENV} makepkg ${_BUILDAH_MAKEPKG_FLAGS} ${_OPT_CON_COPTIONS}"
 
+    log_debug "Copying to cache repo"
     test_null "PKGDEST" "${PKGDEST}" && {
         exec_cmd buildah run --user "${_OPT_CON_BUILD_USER}" ${_BUILDAH_PARAMS} "${_BUILDAH_CONT}" bash -c "cp ${_BUILDAH_MKPKG_PATH}/*${ext} ${_BUILDAH_CACHE_REPO_PATH}"
     } || {
         exec_cmd buildah run --user "${_OPT_CON_BUILD_USER}" ${_BUILDAH_PARAMS} "${_BUILDAH_CONT}" bash -c "cp ${_BUILDAH_PKGDEST_PATH}/*${ext} ${_BUILDAH_CACHE_REPO_PATH}"
     }
 
+    log_debug "Updating cache repo"
     exec_cmd buildah run --user "${_OPT_CON_BUILD_USER}" ${_BUILDAH_PARAMS} "${_BUILDAH_CONT}" bash -c "repo-add -n ${_BUILDAH_CACHE_REPO} ${_BUILDAH_CACHE_REPO_PATH}/*${ext}"
 
     buildah_exit

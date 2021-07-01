@@ -6,7 +6,7 @@ function exit_error() {
 }
 
 function check_mode() {
-    log_debug "set_mode for val '${1}' called"
+    log_debug "check_mode for val '${1}' called"
     if [ -z "${1}" ]
     then
         err="Mode not given"
@@ -33,6 +33,30 @@ function check_mode() {
     esac
 }
 
+function check_log_level() {
+    log_debug "check_log_level for val '${1}' called"
+    if [ -z "${1}" ]
+    then
+        err="Log level cannot be empty"
+        return 1
+    fi
+
+    case "$1" in
+        "DEBUG" \
+            | "INFO" \
+            | "WARN" \
+            | "SUCCESS" \
+            | "ERROR")
+            log_debug "Log level set to '${1}'"
+            return 0
+            ;;
+        *)
+            err="Log level '${1}' invalid"
+            return 1
+            ;;
+    esac
+}
+
 function check_flag() {
     if [ -z "${2}" ]
     then
@@ -44,6 +68,12 @@ function check_flag() {
 
 function set_env() {
     log_info "Checking environment and params"
+
+    check_log_level "${LOG_LEVEL_STDOUT}" \
+        || exit_error "Error setting log level for stdout: '${err}'"
+    check_log_level "${LOG_LEVEL_LOG}" \
+        || exit_error "Error setting log level for log file: '${err}'"
+
     log_debug "Verifying mode '${_OPT_MODE}'"
     check_mode "${_OPT_MODE}" \
         || exit_error "${err}" 1

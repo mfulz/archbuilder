@@ -24,6 +24,7 @@ _OPT_DEPS=()
 _OPT_KEYS=()
 
 _OPT_CON_BUILD_USER="archbuilder"
+_OPT_CON_LOG_LEVEL=""
 _OPT_CON_COPTIONS=""
 
 # actions to initialize runtime
@@ -53,6 +54,7 @@ function usage() {
     echo -e "  -r, --repo <string>\t\t\t\tHost path to use as repository inside the container. This can be used to avoid"
     echo -e "                     \t\t\t\thanding over dependencies via command line arguments as they will be added to this repo"
     echo -e "  -s, --silent <string>\t\t\t\tMake container silent: No output from container commands will be send to shell."
+    echo -e "  -l, --level <string>\t\t\t\tLog level to use: Possible values are DEBUG, INFO, WARN, SUCCESS or ERROR"
     echo -e "  --version <string>\t\t\t\tPrint version information."
     echo
     echo "coptions:"
@@ -61,7 +63,7 @@ function usage() {
 }
 
 options=$(getopt \
-    -o hkn:m:p:d:r:e:s \
+    -o hkn:m:p:d:r:e:sl: \
     -l "help" \
     -l keep \
     -l name: \
@@ -69,6 +71,7 @@ options=$(getopt \
     -l dep: \
     -l repo: \
     -l silent: \
+    -l level: \
     -l version \
     -l key: -- "$@" 2>/dev/null)
 
@@ -100,6 +103,13 @@ while true; do
             ;;
         -s|--silent)
             _FLAG_SILENT=1
+            ;;
+        -l|--level)
+            shift
+            check_log_level "${1}" \
+                || exit_error "${err}"
+            LOG_LEVEL_STDOUT="${1}"
+            LOG_LEVEL_LOG="${1}"
             ;;
         --version)
             echo -e "archbuilder v${archbuilder_version}"
