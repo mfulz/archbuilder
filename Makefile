@@ -6,7 +6,10 @@ LIBDIR ?= $(PREFIX)/lib
 CNFDIR ?= /etc
 ARCHBUILDER_LIB_DIR ?= $(LIBDIR)/$(PROGNM)
 ARCHBUILDER_CONF_DIR ?= $(CNFDIR)/$(PROGNM)
-ARCHBUILDER_VERSION ?= 0.9.3
+ARCHBUILDER_VERSION ?= $(shell git describe --tags || true)
+ifeq ($(ARCHBUILDER_VERSION),)
+	ARCHBUILDER_VERSION := 0.9.4
+endif
 
 .PHONY: install build archbuilder
 
