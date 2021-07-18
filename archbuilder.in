@@ -20,7 +20,6 @@ unset _FLAG_KEEP
 unset _FLAG_SILENT
 
 _OPT_MODE="build"
-_OPT_DEPS=()
 _OPT_KEYS=()
 
 _OPT_CON_BUILD_USER="archbuilder"
@@ -49,7 +48,6 @@ function usage() {
     echo -e "                                      \t\tcreate will setup the base image"
     echo -e "                                      \t\tupdate will update the base image"
     echo -e "                                      \t\tbuild will build the PKGBUILD"
-    echo -e "  -d, --dep <string>\t\t\t\tPath to pacman package file that is needed as dependency for the build. (Can be added multiple times)"
     echo -e "  -e, --key <string>\t\t\t\tPublic signing keys that should be trusted by for the build. (Can be added multiple times)"
     echo -e "  -r, --repo <string>\t\t\t\tHost path to use as repository inside the container. This can be used to avoid"
     echo -e "                     \t\t\t\thanding over dependencies via command line arguments as they will be added to this repo"
@@ -63,12 +61,11 @@ function usage() {
 }
 
 options=$(getopt \
-    -o hkn:m:p:d:r:e:sl: \
+    -o hkn:m:p:r:e:sl: \
     -l "help" \
     -l keep \
     -l name: \
     -l mode: \
-    -l dep: \
     -l repo: \
     -l silent: \
     -l level: \
@@ -88,10 +85,6 @@ while true; do
         -m|--mode)
             shift
             _OPT_MODE="${1}"
-            ;;
-        -d|--dep)
-            shift
-            _OPT_DEPS[${#_OPT_DEPS[*]}]="${1}"
             ;;
         -e|--key)
             shift

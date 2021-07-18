@@ -8,7 +8,7 @@ ARCHBUILDER_LIB_DIR ?= $(LIBDIR)/$(PROGNM)
 ARCHBUILDER_CONF_DIR ?= $(CNFDIR)/$(PROGNM)
 ARCHBUILDER_VERSION ?= $(shell git describe --tags || true)
 ifeq ($(ARCHBUILDER_VERSION),)
-	ARCHBUILDER_VERSION := 0.9.4
+	ARCHBUILDER_VERSION := 0.9.5
 endif
 
 .PHONY: install build archbuilder

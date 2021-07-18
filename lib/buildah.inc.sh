@@ -4,7 +4,6 @@ _BUILDAH_CONT=""
 
 _BUILDAH_BASE_IMAGE="archlinux"
 _BUILDAH_BASE_PATH="/home/archbuilder"
-_BUILDAH_DEP_PATH="${_BUILDAH_BASE_PATH}/deps"
 _BUILDAH_MKPKG_PATH="${_BUILDAH_BASE_PATH}/mkpgs"
 _BUILDAH_PKGDEST_PATH="${_BUILDAH_BASE_PATH}/pkgdest"
 _BUILDAH_CACHE_REPO_NAME="archbuilder_cache_repo"
@@ -143,17 +142,9 @@ function buildah_prepare_build() {
     log_info "Updating container system"
     exec_cmd buildah run --user ${_OPT_CON_BUILD_USER} ${_BUILDAH_PARAMS} "${_BUILDAH_CONT}" sudo pacman --noconfirm -Syu
 
-    return 0
-    for d in "${DEPS[@]}"
+    for k in "${_OPT_KEYS[@]}"
     do
-        buildah copy --chown "${_BUILD_USER}" "${CONT}" "${d}" "${_DEP_PATH}/"
-        f=$(basename "${d}")
-        buildah run "${CONT}" pacman --noconfirm -U "${_DEP_PATH}/${f}"
-    done
-
-    for k in "${KEYS[@]}"
-    do
-        buildah run --user "${_BUILD_USER}" "${CONT}" gpg --receive-keys "${k}"
+        exec_cmd buildah run --user ${_OPT_CON_BUILD_USER} ${_BUILDAH_PARAMS} "${_BUILDAH_CONT}" gpg --receive-keys "${k}"
     done
 }
 
