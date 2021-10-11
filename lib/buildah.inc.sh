@@ -32,6 +32,7 @@ function buildah_prepare_params() {
     _BUILDAH_PARAMS="${_BUILDAH_PARAMS} -v ${ARCHBUILDER_CACHE_REPO}:${_BUILDAH_CACHE_REPO_PATH}:rw,U"
 
     # adding working directory to container
+    # TODO: param -> req for aurutils
     _BUILDAH_PARAMS="${_BUILDAH_PARAMS} -v $(pwd):${_BUILDAH_MKPKG_PATH}:rw,U"
 
     log_info "Preparing makepkg environment"
@@ -81,9 +82,6 @@ function buildah_create() {
 
     log_info "Setting up sudo for user '${_OPT_CON_BUILD_USER}'"
     exec_cmd buildah run "${_BUILDAH_CONT}" bash -c "echo '${_OPT_CON_BUILD_USER} ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/${_OPT_CON_BUILD_USER}"
-
-    log_info "Creating container folder '${_BUILDAH_DEP_PATH}'"
-    exec_cmd buildah run --user "${_OPT_CON_BUILD_USER}" "${_BUILDAH_CONT}" mkdir "${_BUILDAH_DEP_PATH}"
 
     log_info "Creating container folder '${_BUILDAH_MKPKG_PATH}'"
     exec_cmd buildah run --user "${_OPT_CON_BUILD_USER}" "${_BUILDAH_CONT}" mkdir "${_BUILDAH_MKPKG_PATH}"
