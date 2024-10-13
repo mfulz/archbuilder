@@ -80,7 +80,7 @@ Create a repository, that is owned by this user for using [aurutils](https://git
     
 To use now archbuilder as building backend inside aurutils, just add the following to your shell:
 
-    export MAKEPKG="/usr/bin/archbuilderwrap"
+    export AUR_MAKEPKG="/usr/bin/archbuilderwrap"
     
 This script will wrap everything correct to archbuilder and run the makepkg inside the buildah container.
 
